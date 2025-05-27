@@ -20,13 +20,35 @@ export const getWeatherDescription = (code) => {
 };
 
 export const formatHourlyData = (weatherData) => {
-  if (!weatherData) return [];
-  // 밑에 코드 채워주세요
-  return [];
+  if (!weatherData || !weatherData.hourly) return [];
+
+  const { time, temperature_2m, weather_code } = weatherData.hourly;
+  const now = new Date();
+  const startIdx = time.findIndex(t => new Date(t) > now);
+
+  let result = [];
+  for (let i = startIdx; i < startIdx + 12; i++) {
+    if (i >= time.length) break;
+    result.push({
+      time: `${new Date(time[i]).getHours()}시`,
+      temp: Math.round(temperature_2m[i]),
+      code: weather_code[i],
+    });
+  }
+  return result;
 };
 
 export const formatDailyData = (weatherData) => {
-  if (!weatherData) return [];
-  // 밑에 코드 채워주세요
-  return [];
+  if (!weatherData || !weatherData.daily) return [];
+
+  const { time, weather_code, temperature_2m_max } = weatherData.daily;
+  return time.map((dateStr, idx) => {
+    const dateObj = new Date(dateStr);
+    const date = `${dateObj.getMonth() + 1}/${dateObj.getDate()} (${["일","월","화","수","목","금","토"][dateObj.getDay()]})`;
+    return {
+      date,
+      code: weather_code[idx],
+      temp: Math.round(temperature_2m_max[idx]),
+    };
+  });
 };
